@@ -1,0 +1,50 @@
+[gd_scene load_steps=9 format=3 uid="uid://dnw24qgp2h8ot"]
+
+[ext_resource type="Script" path="res://Scripts/game.gd" id="1_4o884"]
+[ext_resource type="Texture2D" uid="uid://dai5v4jd87roe" path="res://Assets/textures/bg.png" id="1_pk6ai"]
+[ext_resource type="PackedScene" uid="uid://d0p0aie5wk5uu" path="res://Scenes/hud.tscn" id="2_1dmq6"]
+[ext_resource type="PackedScene" uid="uid://gjhx3qy6dcjq" path="res://Scenes/player.tscn" id="2_3d8p6"]
+[ext_resource type="PackedScene" uid="uid://bo2kd0yt77a2x" path="res://Scenes/enemy_spawner.tscn" id="3_kx3f2"]
+[ext_resource type="AudioStream" uid="uid://bk2qdyr0pob0g" path="res://Assets/audio/hit.wav" id="6_e4mjk"]
+[ext_resource type="AudioStream" uid="uid://b7352y8gxffmm" path="res://Assets/audio/explode.wav" id="8_d0f8e"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6jsbw"]
+size = Vector2(64, 802)
+
+[node name="Game" type="Node2D"]
+script = ExtResource("1_4o884")
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="HUD" parent="UI" instance=ExtResource("2_1dmq6")]
+
+[node name="Background" type="TextureRect" parent="."]
+offset_right = 1284.0
+offset_bottom = 726.0
+texture = ExtResource("1_pk6ai")
+stretch_mode = 1
+
+[node name="Player" parent="." instance=ExtResource("2_3d8p6")]
+position = Vector2(21, 221)
+
+[node name="EnemySpawner" parent="." instance=ExtResource("3_kx3f2")]
+
+[node name="DeathZone" type="Area2D" parent="."]
+position = Vector2(-195, 331)
+collision_layer = 8
+collision_mask = 2
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DeathZone"]
+position = Vector2(22, 43)
+shape = SubResource("RectangleShape2D_6jsbw")
+
+[node name="EnemyHitSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("6_e4mjk")
+
+[node name="PlayerHitSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("8_d0f8e")
+
+[connection signal="took_damage" from="Player" to="." method="_on_player_took_damage"]
+[connection signal="enemy_spawned" from="EnemySpawner" to="." method="_on_enemy_spawner_enemy_spawned"]
+[connection signal="path_enemy_spawned" from="EnemySpawner" to="." method="_on_enemy_spawner_path_enemy_spawned"]
+[connection signal="area_entered" from="DeathZone" to="." method="_on_death_zone_area_entered"]
